@@ -1,6 +1,6 @@
 # Ghost to Wordpress Blog Migration Tool
 
-Version 1.0.0
+Version 1.1.0
 
 This script can be used to migrate a Ghost blog to Wordpress.
 
