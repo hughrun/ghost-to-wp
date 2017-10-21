@@ -25,9 +25,9 @@
 
 const fs = require('fs');
 const jsontoxml = require('jsontoxml');
-
+const ghostExport = process.argv[2];
 // import the json file here
-const backup = JSON.parse(fs.readFileSync('GhostBackup.json', 'utf-8'));
+const backup = JSON.parse(fs.readFileSync(ghostExport, 'utf-8'));
 
 //xml header
 const now = new Date();
@@ -61,8 +61,7 @@ const header =
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:wp="http://wordpress.org/export/1.2/"
 >
-<channel>
-<wp:wxr_version>1.2</wp:wxr_version>`;
+<channel>\n<wp:wxr_version>1.2</wp:wxr_version>\n`;
 
 // create export file with header.
 fs.writeFileSync('WP_import.xml', header);
@@ -84,7 +83,7 @@ for (let author of backup.db[0].data.users) {
 };
 
 // add generator info
-fs.appendFileSync('WP_import.xml', '<generator>ghost-to-wordpress</generator>');
+fs.appendFileSync('WP_import.xml', '\n<generator>ghost-to-wordpress</generator>\n');
 
 // POSTS
 console.log(`Converting ${backup.db[0].data.posts.length} posts...`);

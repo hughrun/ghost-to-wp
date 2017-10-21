@@ -9,11 +9,12 @@ You will get the full HTML and tags for all posts and pages, including whether i
 ## Usage
 
 * [Export your Ghost site data](https://help.ghost.org/hc/en-us/articles/224112927-Import-Export-Data).
-* Rename your exported json file to GhostBackup.json
-* Download the ghost-to-wordpress script in the same directory, then run these two commands:
+* make sure you have [node](https://nodejs.org/en/) installed on your machine (if you've been using Ghost, you probably already have it, at least on your server)
+* Download ghost-to-wordpress, then run these two commands:
 
-`[sudo] npm install jsontoxml`
-`node ghost_to_wp.js`
+`npm install`
+
+`npm start path/to/your/exportfile.json`
 
 * Import the new `WP_import.xml` file to your WordPress site using the _Wordpress Importer_ plugin.
 
@@ -28,7 +29,6 @@ Ghost doesn't have categories so this only imports tags. You can use the WordPre
 ## TODOs
 
 * fix author migration
-* make package.json and allow simple execution from CLI
 * publish npm package maybe
 
 ## License
