@@ -1,8 +1,10 @@
+#!/usr/bin/env node
+
 /* #####################################################################
-    ghost-to-wordpress
-    Version 1.0.0
+    ghost-to-wp
+    Version 1.2.1
     A script to turn Ghost blog JSON export into Wordpress import XML
-    Copyright (C) 2017  Hugh Rundle
+    Copyright (C) 2017, 2020 Hugh Rundle
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -80,7 +82,7 @@ for (let author of backup.db[0].data.users) {
 	}, {prettyPrint:true, indent: '  '});
 	// append this author's details to the export file.
 	fs.appendFileSync('WP_import.xml', authXML);
-};
+}
 
 // add generator info
 fs.appendFileSync('WP_import.xml', '\n<generator>ghost-to-wordpress</generator>\n');
@@ -185,7 +187,7 @@ for (let post of backup.db[0].data.posts) {
 		]
 	}, {prettyPrint:true, indent: '  '});
 
-	// eliminate any linebreaks, otherwise they fuck up the XML and things become unescaped.
+	// eliminate any linebreaks, otherwise they mess up the XML and things become unescaped.
 	// and append to the file
 	fs.appendFileSync('WP_import.xml', postXML.replace(/(\r\n|\n|\r)/gm,""));
 };

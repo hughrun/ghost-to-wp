@@ -1,11 +1,12 @@
 {
-  "name": "ghost_to_wp",
-  "version": "1.2.0",
-  "description": "A tool to process your Ghost blog export JSON file into a usable Wordpress WXR XML import file. This will enable you to easily migrate your blog from Ghost to Wordpress.",
+  "name": "ghost-to-wp",
+  "version": "1.2.1",
+  "description": "Process your Ghost blog export JSON file into a usable Wordpress WXR XML import file. This will enable you to easily migrate your blog from Ghost to Wordpress.",
   "main": "ghost_to_wp.js",
   "dependencies": {
     "jsontoxml" : "latest"
   },
+  "bin": "./ghost_to_wp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ghost_to_wp.js"
@@ -17,7 +18,7 @@
   "keywords": [
     "ghost",
     "wordpress",
-    "ghost to wordpress",
+    "cli",
     "blog",
     "WXR"
   ],
