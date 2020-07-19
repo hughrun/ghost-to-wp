@@ -11,7 +11,7 @@ You will get the full HTML content, author, and tags for all posts and pages, in
 1. [Export your Ghost site data](https://ghost.org/faq/the-importer) as a JSON file.
 2. make sure you have [nodejs](https://nodejs.org/en/) installed on your machine (if you've been using Ghost, you probably already have it, at least on your server)
 3. Run these two commands:
-```shell
+```less
 npm install -g ghost-to-wp
 ghost-to-wp name_of_your_ghost_export.json
 ```
