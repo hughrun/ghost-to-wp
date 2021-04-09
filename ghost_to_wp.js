@@ -2,7 +2,7 @@
 
 /* #####################################################################
     ghost-to-wp
-    Version 1.2.3
+    Version 1.3.0
     A script to turn Ghost blog JSON export into Wordpress import XML
     Copyright (C) 2017, 2020, 2021 Hugh Rundle
 
@@ -25,10 +25,12 @@
 
 'use strict'
 
-const fs = require('fs');
-const jsontoxml = require('jsontoxml');
-const ghostExport = process.argv[2];
-// import the json file here
+const fs = require('fs')
+const jsontoxml = require('jsontoxml')
+const ghostExport = process.argv[2]
+const siteUrl = process.argv[3]
+
+// import the json file as JSON
 const backup = JSON.parse(fs.readFileSync(ghostExport, 'utf-8'));
 
 // xml header
@@ -172,6 +174,28 @@ fs.appendFileSync('WP_import.xml', '\n<generator>ghost-to-wordpress</generator>\
 console.log(`Converting ${backup.db[0].data.posts.length} posts...`);
 // for each post
 for (let post of backup.db[0].data.posts) {
+  // if a site url was provided, replace __GHOST_URL__ with the url
+  // this should enable images to be imported via the original URLs
+  // if the old site still exists when you import
+  var content = post.html
+
+  // fix image directory links
+
+  if (content) {
+    content = content.replace(/\/content\/images\//gi, '/wp-content/uploads/')
+  }
+
+  // if provided with a URL, replace any refs to __GHOST_URL__ and fix any accidental duplications
+  if (siteUrl && content) {
+    content = content.replace(/__GHOST_URL__/g, siteUrl)
+    // fix any accidental double-ups of the main URL:
+    let esc = siteUrl.replace('//', '\/\/');
+    let double = new RegExp(esc + esc, 'gi')
+    // first run
+    content = content.replace(double, siteUrl)
+    // second run
+    content = content.replace(double, siteUrl)
+  }
 
   // if the published date is null, make it equal to 'now'
   // this will only be for draft posts
@@ -180,7 +204,7 @@ for (let post of backup.db[0].data.posts) {
   // make the post XML
   // eliminate any linebreaks, otherwise they mess up the XML and things become unescaped.
   // also clean up any instances of ]] and enclose as CDATA
-  var content = post.html ? jsontoxml.cdata(post.html.replace(/(\r\n)|\n|\u2028|\u2029/gm,'')) : jsontoxml.cdata('');
+  var content = content ? jsontoxml.cdata(content.replace(/(\r\n)|\n|\u2028|\u2029/gm,'')) : jsontoxml.cdata('');
 
   var postXML = jsontoxml({
     'item':[
