@@ -22,7 +22,7 @@ Convert your Ghost export file:
 ghost-to-wp ghostexportfile.json
 ```
 
-You should now have a new file called `WP_import.xml`. Import this file to your WordPress site using the [Wordpress Importer plugin](https://wordpress.org/plugins/wordpress-importer/) - you will be able to map authors to existing users in Wordpress before the post and page import begins.
+You should now have a new file called `WP_import.xml`. Import this file to your WordPress site using the WordPress site importer (`Tools - Import - WordPress`) - you will be able to map authors to existing users in Wordpress before the post and page import begins, as long as you have created user accounts for your authors ahead of importing.
 
 ## Caveats & Limitations
 
