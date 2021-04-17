@@ -2,7 +2,7 @@
 
 /* #####################################################################
     ghost-to-wp
-    Version 1.3.0
+    Version 2.0.0
     A script to turn Ghost blog JSON export into Wordpress import XML
     Copyright (C) 2017, 2020, 2021 Hugh Rundle
 
@@ -177,40 +177,19 @@ for (let author of backup.db[0].data.users) {
   }
 
 // add generator info
-fs.appendFileSync('WP_import.xml', '\n<generator>ghost-to-wordpress</generator>\n');
+fs.appendFileSync('WP_import.xml', '\n<generator>ghost-to-wordpress v2.0.0</generator>\n');
 
 // POSTS
 console.log(`Converting ${backup.db[0].data.posts.length} posts...`);
 const tagStore = repackage(backup.db[0].data.posts_tags);
 for (let post of backup.db[0].data.posts) {
-  // if a site url was provided, replace __GHOST_URL__ with the url
-  // this should enable images to be imported via the original URLs
-  // if the old site still exists when you import
+
   var content = post.html
 
-  // fix image directory links
-
-    // TODO: change the regex:
-  // find all image links
-  // replace ANYDOMAIN/content/images with siteURL/wp-content/uploads/
-  // FIND: (((http)s?.*)|(__GHOST_URL__))?(\/content\/images\/)
-  // REPLACE_WITH: `${siteUrl/wp-content/uploads/}` <== siteUrl is now the NEW url!
-
-  if (content) {
-    content = content.replace(/\/content\/images\//gi, '/wp-content/uploads/')
-  }
-
-  // if provided with a URL, replace any refs to __GHOST_URL__ and fix any accidental duplications
-  if (siteUrl && content) {
-    content = content.replace(/__GHOST_URL__/g, siteUrl)
-    // fix any accidental double-ups of the main URL:
-    let esc = siteUrl.replace('//', '\/\/');
-    let double = new RegExp(esc + esc, 'gi')
-    // first run
-    content = content.replace(double, siteUrl)
-    // second run
-    content = content.replace(double, siteUrl)
-  }
+  // fix image directory links if a second argument is provided
+    if (content && siteUrl) {
+      content = content.replace(/(((http)s?.*)|(__GHOST_URL__))?(\/content\/images\/)/g, `${siteUrl}/wp-content/uploads/`)
+    } 
 
   // if the published date is null, make it equal to 'now'
   // this will only be for draft posts
