@@ -2,7 +2,7 @@
 
 /* #####################################################################
     ghost-to-wp
-    Version 2.0.0
+    Version 2.0.1
     A script to turn Ghost blog JSON export into Wordpress import XML
     Copyright (C) 2017, 2020, 2021 Hugh Rundle
 
