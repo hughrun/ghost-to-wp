@@ -141,38 +141,47 @@ for (let author of backup.db[0].data.users) {
     return str.replace(/>/g, "&gt;");
   }
 
-  function repackage(post, postsTags){
-    var sendBack = '';
-    const tagStore = {};
-    for (var postTag in postsTags){
-      if (!tagStore[postsTags[postTag].post_id]){
-        tagStore[postsTags[postTag].post_id] = [];
+  // reorganise the tags from Ghost into a Map where keys are post IDs and values are arrays of tag IDs
+  function repackage(postsTags) {
+    const store = new Map();
+    for (var tag of postsTags){
+      if ( !store.has(tag.post_id) ) {
+        store.set( tag.post_id, [tag.tag_id] )
+      } else {
+        let arr = store.get(tag.post_id)
+        arr.push(tag.tag_id)
+        store.set( tag.post_id, arr )
       }
-      tagStore[postsTags[postTag].post_id].push(postsTags[postTag].tag_id)
     }
-      for (var taggedPost in tagStore) {
-        if (taggedPost == post.id) {
-          tagStore[taggedPost].forEach( tagNum => {
-            // each tag needs its own line in the XML file
-            // note that Ghost does not have categories, only tags - there's no distinction
-            const ghostTags = backup.db[0].data.tags;
-            ghostTags.forEach( function(t) {
-              if (t.id == tagNum) {
-                sendBack = `\n  <category domain="post_tag" nicename="${t.name}"><![CDATA[${t.name}]]></category>`
-              }
-            })
-          })
+    return store
+  }
+
+  // Write out categories for each post
+  function writeCategories(post, tagStore){
+    var sendBack = '';
+    for (let [k,v] of tagStore) {
+      if (k == post.id) {
+        for (let tagNum of v ) {
+          // each tag needs its own line in the XML file
+          // note that Ghost does not have categories, only tags - there's no distinction
+          const ghostTags = backup.db[0].data.tags;
+          for (let t of ghostTags) {
+            if (t.id == tagNum) {
+              sendBack += `\n  <category domain="post_tag" nicename="${t.name}"><![CDATA[${t.name}]]></category>`
+            }
+          }
         }
       }
-      return sendBack
     }
+    return sendBack
+  }
 
 // add generator info
 fs.appendFileSync('WP_import.xml', '\n<generator>ghost-to-wordpress</generator>\n');
 
 // POSTS
 console.log(`Converting ${backup.db[0].data.posts.length} posts...`);
-// for each post
+const tagStore = repackage(backup.db[0].data.posts_tags);
 for (let post of backup.db[0].data.posts) {
   // if a site url was provided, replace __GHOST_URL__ with the url
   // this should enable images to be imported via the original URLs
@@ -180,6 +189,12 @@ for (let post of backup.db[0].data.posts) {
   var content = post.html
 
   // fix image directory links
+
+    // TODO: change the regex:
+  // find all image links
+  // replace ANYDOMAIN/content/images with siteURL/wp-content/uploads/
+  // FIND: (((http)s?.*)|(__GHOST_URL__))?(\/content\/images\/)
+  // REPLACE_WITH: `${siteUrl/wp-content/uploads/}` <== siteUrl is now the NEW url!
 
   if (content) {
     content = content.replace(/\/content\/images\//gi, '/wp-content/uploads/')
@@ -217,8 +232,7 @@ for (let post of backup.db[0].data.posts) {
       {name: 'wp:status', text: `<![CDATA[${getPostStatus(post)}]]>`},
       {name: 'wp:post_type', text: `<![CDATA[${getPostType(post)}]]>`},
       {name: 'wp:is_sticky', text: `<![CDATA[${isPostSticky(post)}]]>`},
-      // reorganise the tags from Ghost into an object where keys are post IDs and values are arrays of tag IDs
-      repackage(post, backup.db[0].data.posts_tags) 
+      writeCategories(post, tagStore) 
     ]
   }, {
     prettyPrint: true, 
