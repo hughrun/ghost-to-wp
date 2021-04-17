@@ -125,22 +125,6 @@ for (let author of backup.db[0].data.users) {
   fs.appendFileSync('WP_import.xml', authXML);
 }
 
-  // the title is not within CDATA so we need to make sure that if it contains <, &, or > they are escaped.
-  // escape & in title
-  function safeTitle(title) {
-    var amp = title.replace(/&/g, "&amp;");
-    return lt(amp)
-  }
-  // escape < in title
-  function lt(str) {
-    var newstr = str.replace(/</g, "&lt;")
-    return gt(newstr)
-  }
-  // escape > in title
-  function gt(str) {
-    return str.replace(/>/g, "&gt;");
-  }
-
   // reorganise the tags from Ghost into a Map where keys are post IDs and values are arrays of tag IDs
   function repackage(postsTags) {
     const store = new Map();
@@ -167,7 +151,8 @@ for (let author of backup.db[0].data.users) {
           const ghostTags = backup.db[0].data.tags;
           for (let t of ghostTags) {
             if (t.id == tagNum) {
-              sendBack += `\n  <category domain="post_tag" nicename="${t.name}"><![CDATA[${t.name}]]></category>`
+              let tag_name = jsontoxml.escape(t.name)
+              sendBack += `\n  <category domain="post_tag" nicename="${tag_name}"><![CDATA[${tag_name}]]></category>`
             }
           }
         }
@@ -202,7 +187,7 @@ for (let post of backup.db[0].data.posts) {
 
   var postXML = jsontoxml({
     'item':[
-      {name: 'title', text: `${safeTitle(post.title)}`},
+      {name: 'title', text: `${jsontoxml.escape(post.title)}`},
       {name: 'dc:creator', text:`<![CDATA[${getAuthorName(post)}]]>`},
       {name: 'description', text:' '},
       {name: 'content:encoded', text: content},
