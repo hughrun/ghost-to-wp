@@ -1,4 +1,8 @@
-# Ghost to Wordpress Blog Migration Tool
+# NOTE THIS PROJECT HAS BEEN ARCHIVED
+
+There will be no further maintenance or development.
+
+## Ghost to Wordpress Blog Migration Tool
 
 Use `ghost-to-wp` to migrate a Ghost blog to Wordpress.
 
